@@ -42,7 +42,7 @@ async function run() {
 
          app.post("/addjob", async(req,res)=>{
             const newuser=req.body
-            const result=await postcoll.insertOne(newuser)
+            const result=await usercoll.insertOne(newuser)
             res.send(result)
 
         })
@@ -57,6 +57,32 @@ async function run() {
         const category = await usercoll.findOne({ _id:id });
         res.send(category);
        })
+
+       app.patch('/jobs/:id',async(req,res)=>{
+            const id=req.params.id
+            const updatedJob=req.body
+            
+            const query={_id:new ObjectId(id)}
+            const update={
+                $set:{
+                   title: updatedJob.title,
+                    category: updatedJob.category,
+                    summary: updatedJob.summary,
+                    coverImage: updatedJob.coverImage,
+                    postedAt: updatedJob.postedAt,
+                }
+            }
+            const result=await usercoll.updateOne(query,update)
+            res.send(result)
+        })
+        app.delete('/jobs/:id',async(req,res)=>{
+            const id=req.params.id
+            const query={
+                _id:new ObjectId(id)
+            }
+            const result= await usercoll.deleteOne(query)
+            res.send(result)
+        })
 
      await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
