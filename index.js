@@ -1,16 +1,18 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const express=require ('express')
+const express=require('express')
 const cors=require('cors')
-require('dotenv').config()
-
-const port=process.env.PORT || 3000
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app=express()
-app.use(cors())
 app.use(express.json())
+app.use(cors())
+const port=process.env.PORT || 3000
+
+require ('dotenv').config()
+
 app.get('/',(req,res)=>{
-    res.send('server is running')
+    res.send('server side is running')
 })
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.jckqi5e.mongodb.net/?appName=Cluster0`;
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,18 +22,40 @@ const client = new MongoClient(uri, {
 });
 
 async function run() {
-  try {
-        const database=client.db()
-    await client.connect();
-    
-    await client.db("admin").command({ ping: 1 });
+    try{
+        await client.connect()
+        const database=client.db('assignment10db')
+        const usercoll=database.collection('usercollection')
+
+         app.get('/jobs', async(req,res)=>{
+            const cursor=usercoll.find()
+            const result=await cursor.toArray()
+            res.send(result)
+        })
+
+         app.post("/jobs", async(req,res)=>{
+            const newuser=req.body
+            const result=await usercoll.insertOne(newuser)
+            res.send(result)
+
+        })
+        app.get('/jobs/:id', async (req, res) => {
+        const id = req.params.id;
+        const category = await usercoll.findOne({ _id:id });
+        res.send(category);
+       })
+
+     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    
-    
-  }
+    }
+    finally{
+
 }
-run().catch(console.dir);
+    
+}
+
+run().catch(console.dir)
+
 app.listen(port,()=>{
-     console.log(`Server is running on port ${port}`)
+    console.log(`server side is running ${port}`)
 })
