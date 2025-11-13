@@ -26,13 +26,26 @@ async function run() {
         await client.connect()
         const database=client.db('assignment10db')
         const usercoll=database.collection('usercollection')
+        const postcoll=database.collection('clientcollection')
 
          app.get('/jobs', async(req,res)=>{
             const cursor=usercoll.find()
             const result=await cursor.toArray()
             res.send(result)
         })
+         app.get('/sortedjob', async(req,res)=>{
+            const cursor=usercoll.find().limit(6)
+            const result=await cursor.toArray()
+            res.send(result)
+        })
 
+
+         app.post("/addjob", async(req,res)=>{
+            const newuser=req.body
+            const result=await postcoll.insertOne(newuser)
+            res.send(result)
+
+        })
          app.post("/jobs", async(req,res)=>{
             const newuser=req.body
             const result=await usercoll.insertOne(newuser)
