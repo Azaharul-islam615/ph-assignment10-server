@@ -29,7 +29,7 @@ async function run() {
         const postcoll=database.collection('clientcollection')
 
          app.get('/jobs', async(req,res)=>{
-            const cursor=usercoll.find()
+            const cursor=usercoll.find().sort({ postedAt: -1 })
             const result=await cursor.toArray()
             res.send(result)
         })
