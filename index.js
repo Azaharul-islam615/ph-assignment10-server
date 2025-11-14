@@ -23,19 +23,20 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try{
-        await client.connect()
+        // await client.connect()
         const database=client.db('assignment10db')
         const usercoll=database.collection('usercollection')
         const postcoll=database.collection('clientcollection')
 
          app.get('/jobs', async(req,res)=>{
-            const cursor=usercoll.find().sort({ postedAt: -1 })
+            const cursor=usercoll.find().sort({ postedAt: 1 })
             const result=await cursor.toArray()
             res.send(result)
         })
          app.get('/sortedjob', async(req,res)=>{
             const cursor=usercoll.find().limit(6)
             const result=await cursor.toArray()
+            console.log(result)
             res.send(result)
         })
 
@@ -54,7 +55,7 @@ async function run() {
         })
         app.get('/jobs/:id', async (req, res) => {
         const id = req.params.id;
-        const category = await usercoll.findOne({ _id: new ObjectId(id) });
+        const category = await usercoll.findOne({ _id:new ObjectId(id)  });
         res.send(category);
        })
 
@@ -78,13 +79,13 @@ async function run() {
         app.delete('/jobs/:id',async(req,res)=>{
             const id=req.params.id
             const query={
-                _id:new ObjectId(id)
+                _id:id
             }
             const result= await usercoll.deleteOne(query)
             res.send(result)
         })
 
-     await client.db("admin").command({ ping: 1 });
+    //  await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
     }
     finally{
